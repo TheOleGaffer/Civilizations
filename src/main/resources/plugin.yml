@@ -1,0 +1,62 @@
+main: io.github.theolegaffer.civilizations.Civilizations
+name: Civilizations
+version: 1.0
+website: http://github.com/theolegaffer
+author: Sam
+
+commands:
+  setbuild:
+    description: Sets a new building.
+    usage: /setbuild [typeofbuilding]
+    permission: civilizations.setbuild
+    permission-message: You don't have permission
+  addmoney:
+    description: Adds money to an account.
+    usuage: /addmoney [targetplayer] [amount]
+    permission: civilizations.economy.addmoney
+    permission-message: You don't have permission
+  givemoney:
+    description: Gives money to another player.
+    usuage: /givemoney [targetplayer] [amount]
+    permission: civilizations.economy.givemoney
+    permission-message: You don't have permission
+  money:
+    description: Checks the balance of an account.
+    usuage: /money
+    permission: civilizations.economy.money
+    permission-message: You don't have permission
+  removemoney:
+    description: Removes money from an account.
+    usuage: /removemoney [targetplayer] [amount]
+    permission: civilizations.economy.removemoney
+    permission-message: You don't have permission
+  setmoney:
+    description: Sets the balance of an account.
+    usuage: /setmoney [targetplayer] [amount]
+    permission: civilizations.economy.setmoney
+    permission-message: You don't have permission
+
+
+permissions:
+    civilizations.*:
+        description: Gives access to all civilizations commands
+        children:
+    civilizations.setbuild:
+        description: Allows you to set a new building
+        default: true
+    civilizations.economy.addmoney:
+        description: Add money to an account
+        default: op
+    civilizations.economy.givemoney:
+        description: Gives money to another player
+        default: true
+    civilizations.economy.money:
+        description: Checks the balance in your account
+        default: true
+    civilizations.economy.removemoney:
+        description: Removes money from an account
+        default: op
+    civilizations.economy.setmoney:
+        description: Sets the balance of an account.
+        default: op
+
