@@ -1,13 +1,11 @@
 package io.github.theolegaffer.civilizations.Economy;
 
-
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
 
 /**
  * Created by Sam on 7/13/2015.
@@ -21,7 +19,7 @@ public class econMethods extends JavaPlugin {
     public econMethods(String name){
         this.name = name;
 
-        pData = new File(getDataFolder() +"/Economy/" + name + ".yml");
+        pData = new File("plugins/Civilizations/Economy/" + name + ".yml");
         pDataConfig = YamlConfiguration.loadConfiguration(pData);
     }
 

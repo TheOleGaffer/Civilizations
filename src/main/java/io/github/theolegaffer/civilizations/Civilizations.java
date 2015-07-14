@@ -42,6 +42,7 @@ public class Civilizations extends JavaPlugin{
         String pluginFolder = this.getDataFolder().getAbsolutePath();
 
         (new File(pluginFolder)).mkdirs();
+        (new File(pluginFolder + File.separator + "Economy")).mkdirs();
 //        civFile = getFile();
 //        mainDirectory = getDataFolder().getPath() + File.separator;
 //        flatFileDirectory = mainDirectory + "FlatFiles" + File.separator;
