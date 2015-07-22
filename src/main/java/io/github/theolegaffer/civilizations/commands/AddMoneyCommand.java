@@ -1,7 +1,7 @@
 package io.github.theolegaffer.civilizations.commands;
 
 import io.github.theolegaffer.civilizations.Civilizations;
-import io.github.theolegaffer.civilizations.Economy.econMethods;
+import io.github.theolegaffer.civilizations.Economy.EconomyMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -27,7 +27,7 @@ public class AddMoneyCommand implements CommandExecutor {
                 if (!(sender instanceof Player)) {
                     int amount = Integer.parseInt(args[1]);
 
-                    econMethods econTarg = new econMethods(target.getPlayerListName());
+                    EconomyMethods econTarg = new EconomyMethods(target.getPlayerListName());
 
                     econTarg.giveMoney(amount);
                     econTarg.savePlayerConfig();
@@ -39,7 +39,7 @@ public class AddMoneyCommand implements CommandExecutor {
                 else if (player.hasPermission("economy.addmoney")){
                     int amount = Integer.parseInt(args[1]);
 
-                    econMethods econTarg = new econMethods(target.getPlayerListName());
+                    EconomyMethods econTarg = new EconomyMethods(target.getPlayerListName());
 
                     econTarg.giveMoney(amount);
                     econTarg.savePlayerConfig();

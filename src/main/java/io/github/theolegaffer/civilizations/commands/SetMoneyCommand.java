@@ -1,7 +1,7 @@
 package io.github.theolegaffer.civilizations.commands;
 
 import io.github.theolegaffer.civilizations.Civilizations;
-import io.github.theolegaffer.civilizations.Economy.econMethods;
+import io.github.theolegaffer.civilizations.Economy.EconomyMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -27,7 +27,7 @@ public class SetMoneyCommand implements CommandExecutor {
             int amount = Integer.parseInt(args[1]);
             //checks if the player is online
             if (target != null) {
-                econMethods econTarg = new econMethods(target.getPlayerListName());
+                EconomyMethods econTarg = new EconomyMethods(target.getPlayerListName());
                 if (amount < 0){
                     sender.sendMessage(ChatColor.RED + "You set a value less than 0.");
                 }

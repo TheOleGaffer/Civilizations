@@ -3,8 +3,29 @@ name: Civilizations
 version: 1.0
 website: http://github.com/theolegaffer
 author: Sam
+depend: [WorldEdit]
 
 commands:
+  town:
+    description: Base command
+    usuage: /town <command>
+    permission: civilizations.town
+    permission-message: You don't have permission
+  info:
+    description: Views a town's information
+    usuage: /town info <name>
+    permission: town.info
+    permission-message: You don't have permission
+  create:
+    description: Creates a new town.
+    usage: /town create [nameoftown]
+    permission: civilizations.town.create
+    permission-message: You don't have permission
+  delete:
+    description: Deletes a town.
+    usage: /town delete [nameoftown]
+    permission: civilizations.town.delete
+    permission-message: You don't have permission
   setbuild:
     description: Sets a new building.
     usage: /setbuild [typeofbuilding]
@@ -43,6 +64,9 @@ permissions:
         children:
     civilizations.setbuild:
         description: Allows you to set a new building
+        default: true
+    civilizations.town.createtown:
+        description: Allows you to create a town
         default: true
     civilizations.economy.addmoney:
         description: Add money to an account

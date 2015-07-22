@@ -6,7 +6,7 @@
 
     <groupId>io.github.theolegaffer</groupId>
     <artifactId>civilizations</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1</version>
     <build>
         <plugins>
             <plugin>
@@ -15,7 +15,27 @@
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
+
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <relocation>
+                                <pattern>mondocommand</pattern>
+                                <shadedPattern>io.github.theolegaffer.civilizations.mondocommand</shadedPattern>
+                            </relocation>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -23,6 +43,10 @@
         <repository>
             <id>bukkit-repo</id>
             <url>http://repo.bukkit.org/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>crast-repo</id>
+            <url>http://maven.crast.us</url>
         </repository>
     </repositories>
     <dependencies>
@@ -33,7 +57,16 @@
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>us.crast</groupId>
+            <artifactId>MondoCommand</artifactId>
+            <version>0.3</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
+
+
 
 
 </project>

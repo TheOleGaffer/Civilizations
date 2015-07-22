@@ -19,7 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class Tools extends JavaPlugin {
 //    private Selection s;
-
+//
 //    public WorldEditPlugin getWorldEdit(){
 //        Plugin p = Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
 //        if (p instanceof WorldEditPlugin) return (WorldEditPlugin) p;
@@ -45,14 +45,14 @@ public class Tools extends JavaPlugin {
 //                return true;
 //            }
 //            else{
-//                if ()
+//                sender.sendMessage(ChatColor.GREEN + "Set area!");
 //            }
 //
 //        }
-//
+//        return false;
 //    }
-//
-//}
+
+}
 //    Selection sel = worldEditPlugin.getSelection(player);
 //
 //    if (sel instanceof CuboidSelection) {
@@ -70,4 +70,4 @@ public class Tools extends JavaPlugin {
 //    }else{
 //        player.sendMessage(ChatColor.DARK_RED + "Invalid Selection!");
 //    }
-}
+

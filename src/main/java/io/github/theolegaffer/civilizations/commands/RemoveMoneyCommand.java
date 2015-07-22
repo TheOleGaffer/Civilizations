@@ -1,7 +1,7 @@
 package io.github.theolegaffer.civilizations.commands;
 
 import io.github.theolegaffer.civilizations.Civilizations;
-import io.github.theolegaffer.civilizations.Economy.econMethods;
+import io.github.theolegaffer.civilizations.Economy.EconomyMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -26,7 +26,7 @@ public class RemoveMoneyCommand implements CommandExecutor {
             Player player = (Player) sender;
             int amount = Integer.parseInt(args[1]);
             if (target != null) {
-                econMethods econTarg = new econMethods(target.getPlayerListName());
+                EconomyMethods econTarg = new EconomyMethods(target.getPlayerListName());
                 if (econTarg.getMoney() - amount < 0){
                     sender.sendMessage(ChatColor.RED + "You cannot remove more money than they have.");
                 }

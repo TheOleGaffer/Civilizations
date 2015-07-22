@@ -1,7 +1,7 @@
 package io.github.theolegaffer.civilizations.commands;
 
 import io.github.theolegaffer.civilizations.Civilizations;
-import io.github.theolegaffer.civilizations.Economy.econMethods;
+import io.github.theolegaffer.civilizations.Economy.EconomyMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -26,8 +26,8 @@ public class GiveMoneyCommand implements CommandExecutor {
                 Player player = (Player) sender;
 
                 if (target != null) {
-                    econMethods econSend = new econMethods(player.getPlayerListName());
-                    econMethods econTarg = new econMethods(target.getPlayerListName());
+                    EconomyMethods econSend = new EconomyMethods(player.getPlayerListName());
+                    EconomyMethods econTarg = new EconomyMethods(target.getPlayerListName());
 
                     if (econSend.getMoney() - amount < 0) {
                         player.sendMessage(ChatColor.RED + "You cannot give more money then you have.");

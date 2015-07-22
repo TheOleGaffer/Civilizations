@@ -11,15 +11,15 @@ import java.io.IOException;
  * Created by Sam on 7/13/2015.
  */
 
-public class econMethods extends JavaPlugin {
+public class EconomyMethods extends JavaPlugin {
     String name;
     File pData;
     FileConfiguration pDataConfig;
 
-    public econMethods(String name){
+    public EconomyMethods(String name){
         this.name = name;
 
-        pData = new File("plugins/Civilizations/Economy/" + name + ".yml");
+        pData = new File("plugins/Civilizations/PlayerData/" + name + ".yml");
         pDataConfig = YamlConfiguration.loadConfiguration(pData);
     }
 
@@ -34,6 +34,7 @@ public class econMethods extends JavaPlugin {
     public void createPlayerDefaults() {
         if (pData.length() <= 0) { // Checking if there isn't any data in the file.
             pDataConfig.set("Money", 50);
+            pDataConfig.set("Town","none");
         }
     }
 
@@ -47,6 +48,14 @@ public class econMethods extends JavaPlugin {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getTown(){
+        return pDataConfig.getString("Town");
+    }
+
+    public void setTown(String townname){
+        pDataConfig.set("Town", townname);
     }
 
     public int getMoney() {

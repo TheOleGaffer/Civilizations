@@ -1,6 +1,6 @@
 package io.github.theolegaffer.civilizations.events;
 
-import io.github.theolegaffer.civilizations.Economy.econMethods;
+import io.github.theolegaffer.civilizations.Economy.EconomyMethods;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -15,7 +15,7 @@ public class LoginListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerLoginEvent event){
         Player player = event.getPlayer();
-        econMethods econ = new econMethods(player.getPlayerListName());
+        EconomyMethods econ = new EconomyMethods(player.getPlayerListName());
 
         econ.createPlayerConfig();
         econ.createPlayerDefaults();

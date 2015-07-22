@@ -1,7 +1,7 @@
 package io.github.theolegaffer.civilizations.commands;
 
 import io.github.theolegaffer.civilizations.Civilizations;
-import io.github.theolegaffer.civilizations.Economy.econMethods;
+import io.github.theolegaffer.civilizations.Economy.EconomyMethods;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -22,7 +22,7 @@ public class MoneyCommand implements CommandExecutor {
         if (cmd.getName().equalsIgnoreCase("money")){
             if (sender instanceof Player) {
                 Player player = (Player) sender;
-                econMethods econ = new econMethods(player.getPlayerListName());
+                EconomyMethods econ = new EconomyMethods(player.getPlayerListName());
                 sender.sendMessage("You have " + econ.getMoney() + " dollars!");
                 return true;
             }

@@ -63,7 +63,7 @@ public class ListStore {
     }
 
     public boolean contains(String value){
-        return this.values.contains(values);
+        return this.values.contains(value);
     }
 
     public void add(String value){
@@ -74,5 +74,9 @@ public class ListStore {
 
     public void remove(String value){
         this.values.remove(value);
+    }
+
+    public ArrayList<String> listReturn(){
+        return values;
     }
 }
