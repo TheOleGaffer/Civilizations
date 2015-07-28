@@ -43,7 +43,7 @@ public class TownInfoHandler implements SubHandler{
             List<String> nList = tData.getPlayers();
             String names = "";
             for (String temp : nList) {
-                names = names + temp + ", ";
+                names = names + temp + " ";
             }
             call.reply("{AQUA}Owner: " + tData.getOwner());
             call.reply("{AQUA}Townmembers: " + names);

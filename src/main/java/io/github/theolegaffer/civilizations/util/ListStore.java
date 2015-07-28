@@ -14,7 +14,7 @@ public class ListStore {
 
     public ListStore(File file){
         this.storageFile = file;
-        this.values = new ArrayList<String>();
+        this.values = new ArrayList();
 
         if (this.storageFile.exists() == false){
             try {

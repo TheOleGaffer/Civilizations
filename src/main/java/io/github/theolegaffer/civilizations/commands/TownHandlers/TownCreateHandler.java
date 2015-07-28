@@ -1,11 +1,14 @@
 package io.github.theolegaffer.civilizations.commands.TownHandlers;
 
 import io.github.theolegaffer.civilizations.Economy.EconomyMethods;
-import io.github.theolegaffer.civilizations.util.ListStore;
-import io.github.theolegaffer.civilizations.util.TownDataHandler;
+import io.github.theolegaffer.civilizations.util.*;
 import mondocommand.CallInfo;
 import mondocommand.MondoFailure;
 import mondocommand.SubHandler;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 
@@ -20,6 +23,7 @@ public class TownCreateHandler implements SubHandler{
         ListStore townList = new ListStore(new File("plugins/Civilizations/TownData/town-list.txt"));
         townList.load();
         String tName = call.getArg(0);
+        Location loc1,loc2;
         if (!(townList.contains(tName))) {
             TownDataHandler newTown = new TownDataHandler(tName);
             EconomyMethods econTarg = new EconomyMethods(call.getPlayer().getPlayerListName());
@@ -38,7 +42,25 @@ public class TownCreateHandler implements SubHandler{
                 newTown.saveTownConfig();
                 townList.add(tName);
                 townList.save();
+                Player player = Bukkit.getServer().getPlayer(call.getPlayer().getPlayerListName());
+                newTown.setSpawn(LocationSerializerWithPY.getSerializedLocation(player.getLocation()));
+                newTown.saveTownConfig();
+
+                loc1 = player.getLocation();
+                loc2 = player.getLocation();
+                loc1.setX(loc1.getX() + 8);
+                loc1.setY(255);
+                loc1.setZ(loc1.getZ() + 8);
+                loc2.setX(loc2.getX() - 8);
+                loc2.setY(0);
+                loc2.setZ(loc2.getZ() - 8);
+                Cuboid cuboid = new Cuboid(loc1, loc2);
+                cuboid.setTownName(tName);
+                newTown.setTownLimits(cuboid.newSerialize());
+                newTown.saveTownConfig();
+
                 call.reply("{GREEN}You successfully created a new town named " + tName);
+                Bukkit.getServer().broadcastMessage(ChatColor.AQUA + "The new town " + tName + " was formed.");
             }
         }
         else{

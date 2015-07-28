@@ -38,16 +38,7 @@ public class TownDeleteHandler implements SubHandler{
             else{
                 call.reply("{RED}You are not the owner of that town!");
             }
-//              else if (pName.equals(delTown.getOwner())) {
-//                for (String temp : nList) {
-//                    EconomyMethods econTarg = new EconomyMethods(temp);
-//                    econTarg.setTown("none");
-//                    econTarg.savePlayerConfig();
-//                }
-//                delTown.deleteTownConfig();
-//                townList.remove(tName);
-//                townList.save();
-//            }
+
         }
         else{
             call.reply("{RED}That town does not exist!");

@@ -26,6 +26,41 @@ commands:
     usage: /town delete [nameoftown]
     permission: civilizations.town.delete
     permission-message: You don't have permission
+  invite:
+    decription: Invites a player to your town.
+    usuage: / invite [nameofplayer]
+    permission: civilizations.town.invite
+    permission-message: You don't have permission
+  remove:
+    description: Removes a player from your town.
+    usuage: /town remove [nameofplayer] [nameoftown]
+    permission: civilizations.town.remove
+    permission-message: You don't have permission
+  leave:
+    description: Leaves your current town.
+    usuage: /town leave
+    permission: civilizations.town.leave
+    permission-message: You don't have permission
+  listall:
+    description: Lists all the towns.
+    usuage: /town listall
+    permission: civilizations.town.listall
+    permission-message: You don't have permission
+  spawn:
+    description: Teleports you to the town spawn
+    usuage: /town spawn
+    permission: civilizations.town.spawn
+    permission-message: You don't have permission
+  accept:
+     decription: Accepts
+     usuage: /accept
+     permission: civilizations.accept
+     permission-message: You don't have permission
+  decline:
+     description: Declines
+     usuage: /decline
+     permission: civilizations.decline
+     permission-message: You don't have permission
   setbuild:
     description: Sets a new building.
     usage: /setbuild [typeofbuilding]
@@ -64,6 +99,39 @@ permissions:
         children:
     civilizations.setbuild:
         description: Allows you to set a new building
+        default: true
+    civilizations.town:
+        description: Base command
+        default: true
+    civilizations.town.info:
+        description: Views a town's information
+        default: true
+    civilizations.town.create:
+        description: Creates a new town.
+        default: true
+    civilizations.town.delete:
+        description: Deletes a town.
+        default: true
+    civilizations.town.invite:
+        decription: Invites a player to your town.
+        default: true
+    civilizations.town.remove:
+        description: Removes a player from your town.
+        default: true
+    civilizations.town.leave:
+        description: Leaves your current town.
+        default: true
+    civilizations.town.listall:
+        description: Lists all the towns.
+        default: true
+    civilizations.town.spawn:
+        description: Teleports you to the town spawn
+        default: true
+    civilizations.accept:
+        decription: Accepts
+        default: true
+    civilizations.decline:
+        description: Declines
         default: true
     civilizations.town.createtown:
         description: Allows you to create a town

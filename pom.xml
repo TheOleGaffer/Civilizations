@@ -29,14 +29,11 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <relocation>
-                                <pattern>mondocommand</pattern>
-                                <shadedPattern>io.github.theolegaffer.civilizations.mondocommand</shadedPattern>
-                            </relocation>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
     <repositories>
@@ -63,6 +60,14 @@
             <version>0.3</version>
             <type>jar</type>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>WorldEdit</artifactId>
+            <version>5.4.2</version>
+            <type>jar</type>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/worldedit-5.4.2/WorldEdit.jar</systemPath>
         </dependency>
     </dependencies>
 
