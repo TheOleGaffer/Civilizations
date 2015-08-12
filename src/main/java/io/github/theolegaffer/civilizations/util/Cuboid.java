@@ -27,6 +27,30 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
         this(loc, loc);
     }
 
+    public Cuboid(Location loc1, Location loc2, String townName) {
+        if (loc1 != null && loc2 != null) {
+            if (loc1.getWorld() != null && loc2.getWorld() != null) {
+                if (!loc1.getWorld().getUID().equals(loc2.getWorld().getUID()))
+                    throw new IllegalStateException("The 2 locations of the cuboid must be in the same world!");
+            } else {
+                throw new NullPointerException("One/both of the worlds is/are null!");
+            }
+            this.worldName = loc1.getWorld().getName();
+            this.townName = townName;
+
+            double xPos1 = Math.min(loc1.getX(), loc2.getX());
+            double yPos1 = Math.min(loc1.getY(), loc2.getY());
+            double zPos1 = Math.min(loc1.getZ(), loc2.getZ());
+            double xPos2 = Math.max(loc1.getX(), loc2.getX());
+            double yPos2 = Math.max(loc1.getY(), loc2.getY());
+            double zPos2 = Math.max(loc1.getZ(), loc2.getZ());
+            this.minimumPoint = new Vector(xPos1, yPos1, zPos1);
+            this.maximumPoint = new Vector(xPos2, yPos2, zPos2);
+        } else {
+            throw new NullPointerException("One/both of the locations is/are null!");
+        }
+    }
+
     public Cuboid(Location loc1, Location loc2) {
         if (loc1 != null && loc2 != null) {
             if (loc1.getWorld() != null && loc2.getWorld() != null) {
@@ -54,6 +78,7 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
         if (worldName == null || Bukkit.getServer().getWorld(worldName) == null)
             throw new NullPointerException("One/both of the worlds is/are null!");
         this.worldName = worldName;
+        this.townName = townName;
 
         double xPos1 = Math.min(x1, x2);
         double xPos2 = Math.max(x1, x2);
@@ -122,6 +147,13 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
 
     public double getVolume() {
         return (this.getUpperX() - this.getLowerX() + 1) * (this.getUpperY() - this.getLowerY() + 1) * (this.getUpperZ() - this.getLowerZ() + 1);
+    }
+
+    public boolean allowedSizeBig(){
+        if (getVolume() >= 50){
+            return true;
+        }
+        else return false;
     }
 
     public World getWorld() {

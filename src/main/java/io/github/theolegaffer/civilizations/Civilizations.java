@@ -2,16 +2,25 @@ package io.github.theolegaffer.civilizations;
 
 
 
+import com.gmail.nossr50.api.ExperienceAPI;
+import com.gmail.nossr50.datatypes.SkillType;
+import com.gmail.nossr50.events.experience.McMMOPlayerXpGainEvent;
 import io.github.theolegaffer.civilizations.Economy.EconomyMethods;
 import io.github.theolegaffer.civilizations.commands.*;
 import io.github.theolegaffer.civilizations.commands.TownHandlers.*;
+import io.github.theolegaffer.civilizations.commands.TownHandlers.SetHandlers.SetBorderHandler;
 import io.github.theolegaffer.civilizations.events.LoginListener;
 import io.github.theolegaffer.civilizations.events.PlayerMoveListener;
+import io.github.theolegaffer.civilizations.events.XPGainListener;
 import io.github.theolegaffer.civilizations.util.Cuboid;
 import io.github.theolegaffer.civilizations.util.ListStore;
 import io.github.theolegaffer.civilizations.util.TownDataHandler;
 import mondocommand.MondoCommand;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.util.ArrayList;
@@ -20,9 +29,9 @@ import java.util.ArrayList;
 /**
  * Created by Sam on 7/12/2015.
  */
-public class Civilizations extends JavaPlugin{
-    protected ListStore townList;
-    protected ArrayList<Cuboid> townBorders = new ArrayList<>();
+public class Civilizations extends JavaPlugin implements Listener{
+
+
 
     @Override
     public void onEnable(){
@@ -39,7 +48,8 @@ public class Civilizations extends JavaPlugin{
         this.getCommand("accept").setExecutor(new AcceptCommand(this));
         this.getCommand("decline").setExecutor(new DeclineCommand(this));
         getServer().getPluginManager().registerEvents(new LoginListener(), this);
-        getServer().getPluginManager().registerEvents(new PlayerMoveListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerMoveListener(), this); //for playermove event when entering towns
+        getServer().getPluginManager().registerEvents(new XPGainListener(), this);
         this.getLogger().info("Civilizations has been enabled on this server!");
 /**
  * This is starts the economy schedule to add 20 dollars every 15 minutes
@@ -65,25 +75,6 @@ public class Civilizations extends JavaPlugin{
         (new File(pluginFolder)).mkdirs();
         (new File(pluginFolder + File.separator + "PlayerData")).mkdirs();
         (new File(pluginFolder + File.separator + "TownData")).mkdirs();
-        this.townList = new ListStore(new File(pluginFolder + File.separator + "TownData" + File.separator +"town-list.txt"));
-        this.townList.load();
-
-        ArrayList<String> tNames = this.townList.listReturn();
-        for (String temp : tNames){
-            getLogger().info("looping with ." + temp + ".");
-            TownDataHandler newTown = new TownDataHandler(temp);
-            if(newTown == null){
-                getLogger().info("Whoops newtown is null");
-            }
-            getLogger().info("newTown test " + newTown.getTownLimits());
-            Cuboid temp2 = Cuboid.newDeserialize(newTown.getTownLimits());
-            if (temp2 == null){
-                getLogger().info("whoops temp2 is null");
-            }
-            addBorders(temp2);
-            getLogger().info("via array " + townBorders.get(0).getTownName());
-            getLogger().info(temp2.getTownName());
-        }
 
     }
     public void setupCommandHelpers(){
@@ -135,28 +126,22 @@ public class Civilizations extends JavaPlugin{
             .setHandler(new TownSpawnHandler());
         base.addSub("build", "civilizations.town.build")
             .setDescription("Creates a new type of building")
-            .setMinArgs(1)
-            .setUsage("<typeofbuilding>")
+            .setMinArgs(2)
+            .setUsage("<typeofbuilding> <name>")
             .setHandler(new TownBuildHandler());
 
         base.addSub("set")
             .setDescription("Set's town properties")
             .setUsage("[property] <argument>")
             .setHandler(setSub);
+        setSub.addSub("border", "civilizations.town.border")
+              .setDescription("Sets a new border for the town via your location")
+              .setHandler(new SetBorderHandler());
     }
     @Override
     public void onDisable(){
         this.getLogger().info("Civilizations has been disabled on this server.");
     }
 
-    public void addBorders(Cuboid cuboid){
-        townBorders.add(cuboid);
-    }
-    public Cuboid getBorder(int index){
-        return townBorders.get(index);
-    }
-    public ArrayList<Cuboid> getBorderArray(){
-        return townBorders;
-    }
 }
 

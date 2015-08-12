@@ -48,12 +48,13 @@ public class TownCreateHandler implements SubHandler{
 
                 loc1 = player.getLocation();
                 loc2 = player.getLocation();
-                loc1.setX(loc1.getX() + 8);
+                // the location becomes this number multiplied by 2 (so 30 becomes a 60 by 60 square
+                loc1.setX(loc1.getX() + 30);
                 loc1.setY(255);
-                loc1.setZ(loc1.getZ() + 8);
-                loc2.setX(loc2.getX() - 8);
+                loc1.setZ(loc1.getZ() + 30);
+                loc2.setX(loc2.getX() - 30);
                 loc2.setY(0);
-                loc2.setZ(loc2.getZ() - 8);
+                loc2.setZ(loc2.getZ() - 30);
                 Cuboid cuboid = new Cuboid(loc1, loc2);
                 cuboid.setTownName(tName);
                 newTown.setTownLimits(cuboid.newSerialize());

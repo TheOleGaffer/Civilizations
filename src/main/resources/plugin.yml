@@ -3,7 +3,7 @@ name: Civilizations
 version: 1.0
 website: http://github.com/theolegaffer
 author: Sam
-depend: [WorldEdit]
+depend: [WorldEdit, mcMMO]
 
 commands:
   town:

@@ -67,7 +67,18 @@ public class EconomyMethods extends JavaPlugin {
     }
 
     public void takeMoney(int amount) {
-        pDataConfig.set("Money", getMoney() - amount);
+        if (!(getMoney() - amount < 0)) {
+            pDataConfig.set("Money", getMoney() - amount);
+        }
+        else{
+            return;
+        }
+    }
+    public boolean takeMoneyAllowed(int amount){
+        if (getMoney() - amount < 0){
+            return false;
+        }
+        else return true;
     }
 
     public void giveMoney(int amount) {

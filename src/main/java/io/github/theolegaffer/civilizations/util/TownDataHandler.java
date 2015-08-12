@@ -1,5 +1,8 @@
 package io.github.theolegaffer.civilizations.util;
 
+import io.github.theolegaffer.civilizations.Towns.Building;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -13,10 +16,11 @@ import java.util.*;
  * Created by Sam on 7/14/2015.
  */
 public class TownDataHandler extends JavaPlugin {
-    String name;
-    File tDataFile;
-    FileConfiguration tDataConfig;
-    public ListStore townPlayers;
+    private String name;
+    private File tDataFile;
+    private FileConfiguration tDataConfig;
+    private List<String> buildList = new ArrayList<>();
+    private ListStore townPlayers;
 
     public TownDataHandler(String name){
         this.name = name;
@@ -36,27 +40,30 @@ public class TownDataHandler extends JavaPlugin {
     }
 
     public void createTownDefaults() {
-        List<String> list = new ArrayList<>();
+        ArrayList<String> list = new ArrayList<>();
         Map<String,Object> map = new HashMap<>();
         if (tDataFile.length() <= 0) { // Checking if there isn't any data in the file.
-            tDataConfig.set("Owner", "default");
-            tDataConfig.set("Money", 0);
-            tDataConfig.set("playerlist", list);
-            tDataConfig.set("TownSpawn", "");
-            tDataConfig.set("townlimits", "");
-            tDataConfig.set("towncenter", 0);
-            tDataConfig.set("baracks", 0);
-            tDataConfig.set("archery", 0);
-            tDataConfig.set("walls", 0);
-            tDataConfig.set("gates", 0);
-            tDataConfig.set("farm", 0);
-            tDataConfig.set("apothecary", 0);
-            tDataConfig.set("barn", 0);
-            tDataConfig.set("forge", 0);
-            tDataConfig.set("generalstore", 0);
-            tDataConfig.set("bank", 0);
-            tDataConfig.set("temple", 0);
-            tDataConfig.set("teleporter", 0);
+            tDataConfig.createSection("info");
+            tDataConfig.set("info.owner", "default");
+            tDataConfig.set("info.money", 0);
+            tDataConfig.set("info.playerlist", list);
+            tDataConfig.set("info.townspawn", "");
+            tDataConfig.set("info.townlimits", "");
+            tDataConfig.createSection("buildings");
+            tDataConfig.createSection("building");
+            tDataConfig.set("buildings.towncenter", 0);
+            tDataConfig.set("buildings.baracks", 0);
+            tDataConfig.set("buildings.archery", 0);
+            tDataConfig.set("buildings.walls", 0);
+            tDataConfig.set("buildings.gates", 0);
+            tDataConfig.set("buildings.farm", 0);
+            tDataConfig.set("buildings.apothecary", 0);
+            tDataConfig.set("buildings.barn", 0);
+            tDataConfig.set("buildings.forge", 0);
+            tDataConfig.set("buildings.generalstore", 0);
+            tDataConfig.set("buildings.bank", 0);
+            tDataConfig.set("buildings.temple", 0);
+            tDataConfig.set("buildings.teleporter", 0);
         }
     }
 
@@ -77,56 +84,154 @@ public class TownDataHandler extends JavaPlugin {
     }
 
     public void addPlayers(String playername){
-        List<String> list = tDataConfig.getStringList("playerlist");
+        List<String> list = tDataConfig.getStringList("info.playerlist");
         List<String> newList = new ArrayList<>();
         newList.add(playername);
         list.addAll(newList);
-        tDataConfig.set("playerlist",list);
+        tDataConfig.set("info.playerlist",list);
     }
 
     public void removePlayers(String playername){
-        List<String> list = tDataConfig.getStringList("playerlist");
-        List<String> newList = new ArrayList<>();
-        newList.add(playername);
-        list.removeAll(newList);
-        tDataConfig.set("playerlist",list);
-    }
-
-
-    public void addBuild(String buildingName) {
-        tDataConfig.set(buildingName, (getBuild(buildingName) + 1));
-    }
-
-    public int getBuild(String buildingName) {
-        return tDataConfig.getInt(buildingName);
+        List<String> list = tDataConfig.getStringList("info.playerlist");
+        list.remove(playername);
+        tDataConfig.set("info.playerlist",list);
     }
 
     public void setOwner(String ownerName){
-        tDataConfig.set("Owner",ownerName);
+        tDataConfig.set("info.owner",ownerName);
     }
     public String getOwner(){
-        return tDataConfig.getString("Owner");
+        return tDataConfig.getString("info.owner");
     }
 
     public void setSpawn(String location){
-        tDataConfig.set("TownSpawn", location);
+        tDataConfig.set("info.townspawn", location);
     }
 
     public String getSpawn(){
-        return tDataConfig.getString("TownSpawn");
+        return tDataConfig.getString("info.townspawn");
     }
 
 
     public void setTownLimits(String location){
-        tDataConfig.set("townlimits", location);
+        tDataConfig.set("info.townlimits", location);
     }
 
     public String getTownLimits(){
-        return tDataConfig.getString("townlimits");
+        return tDataConfig.getString("info.townlimits");
     }
 
 
     public List<String> getPlayers(){
-        return tDataConfig.getStringList("playerlist");
+        return tDataConfig.getStringList("info.playerlist");
     }
+
+    public boolean inTownBorder(Location location){
+        Cuboid townBorder = Cuboid.newDeserialize(getTownLimits());
+        if (townBorder.containsLocation(location)){
+            return true;
+        }
+        else return false;
+    }
+
+    public boolean inBuildingBorder(Location location){
+        List<String> bList = getBuildList();
+        for (String name : bList){
+            Cuboid temp = Cuboid.newDeserialize(tDataConfig.getString("building." + name + ".location"));
+            if (temp.containsLocation(location)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean inBuildingBorder(Location max, Location min){
+        Cuboid givenCuboid = new Cuboid(max, min);
+        List<Block> lBlock = givenCuboid.getBlocks();
+        List<String> bList = getBuildList();
+        for (String name : bList){
+            Cuboid temp = Cuboid.newDeserialize(tDataConfig.getString("building." + name + ".location"));
+            for (Block block : lBlock){
+                Location blockLoc = new Location(block.getWorld(),(double)block.getX(),(double)block.getY(), (double)block.getZ());
+                if (temp.containsLocation(blockLoc)){
+                    return true;
+                }
+            }
+
+        }
+        return false;
+    }
+
+    public String getBuildLocation(String buildName){
+        return tDataConfig.getString("building." + buildName + ".location");
+    }
+
+    public void addBuild(Building building) {
+        String type = building.getType();
+        String name = building.getName();
+        String location = building.getLocation();
+        String enterM = building.getEnterMessage();
+        String leaveM = building.getLeaveMessage();
+        String linkedBuild = building.getLinked();
+        tDataConfig.set("building." + name, name);
+        tDataConfig.set("building." + name + ".type", type);
+        tDataConfig.set("building." + name + ".location", location);
+        tDataConfig.set("building." + name + ".entermessage", enterM);
+        tDataConfig.set("building." + name + ".leavemessage", leaveM);
+        tDataConfig.set("building." + name + ".linkedbuild", linkedBuild);
+        //Adds new building to list
+        List<String> bList = getBuildList();
+        bList.add(name);
+        tDataConfig.set("info.buildlist", bList);
+        //Adds the count of the type of buildings
+        tDataConfig.set("buildings." + type.toLowerCase(), (getBuildNum(type) + 1));
+    }
+
+    public void removeBuild(String name){
+        String type = tDataConfig.getString("building." + name + ".type");
+        //cannot actually delete the building
+        tDataConfig.set("building." + name, "deleted");
+        List<String> bList = getBuildList();
+        bList.remove(name);
+        tDataConfig.set("info.buildlist", bList);
+        //Lessens the count of the type of buildings
+        tDataConfig.set("buildings." + type, (getBuildNum(type) - 1));
+    }
+
+    public List<String> getBuildList(){
+        return tDataConfig.getStringList("info.buildlist");
+    }
+
+    public boolean containsBuildName(String name){
+        List<String> buildList = getBuildList();
+        for (String temp : buildList){
+            if (temp.equalsIgnoreCase(name)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int getBuildNum(String buildType) {
+        return tDataConfig.getInt("buildings." + buildType.toLowerCase());
+    }
+
+    public void setEnterM(String name, String msg){
+        tDataConfig.set("building." + name + ".entermessage", msg);
+    }
+
+    public String getEnterM(String buildName){
+        return tDataConfig.getString("building." + buildName + ".entermessage");
+    }
+
+    public void setLeaveM(String name, String msg){
+        tDataConfig.set("building." + name + ".leavemessage", msg);
+    }
+
+    public void setLinked(String name, String linked){
+        tDataConfig.set("building." + name + ".linkedbuild", linked);
+    }
+
+
+
 }
