@@ -1,20 +1,30 @@
 package io.github.theolegaffer.civilizations.commands.TownHandlers;
 
-import com.gmail.nossr50.api.ExperienceAPI;
-import com.gmail.nossr50.datatypes.SkillType;
-import com.gmail.nossr50.events.experience.McMMOPlayerExperienceEvent;
-import com.gmail.nossr50.events.experience.McMMOPlayerXpGainEvent;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
+import io.github.theolegaffer.civilizations.Civilizations;
 import io.github.theolegaffer.civilizations.Economy.EconomyMethods;
 import io.github.theolegaffer.civilizations.Towns.Building;
 import io.github.theolegaffer.civilizations.util.Cuboid;
+import io.github.theolegaffer.civilizations.util.PerkReloader;
 import io.github.theolegaffer.civilizations.util.TownDataHandler;
 import mondocommand.CallInfo;
 import mondocommand.MondoFailure;
 import mondocommand.SubHandler;
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.api.npc.NPCRegistry;
+import net.citizensnpcs.api.trait.trait.MobType;
+import net.dtl.citizens.trader.CitizensTrader;
+import net.dtl.citizens.trader.TraderCharacterTrait;
+import net.dtl.citizens.trader.TraderCommandExecutor;
+import net.dtl.citizens.trader.traits.TraderTrait;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -54,7 +64,7 @@ public class TownBuildHandler implements SubHandler{
                         //Checks if any of the blocks are in another building
                         if (!(newTown.inBuildingBorder(sel.getMaximumPoint(), sel.getMinimumPoint()))) {
                             if (buildType.equalsIgnoreCase("towncenter")) {
-                                towncenterBuild(tName, pName, sel, bName);
+                                townCenterBuild(tName, pName, sel, bName);
                             } else {
                                 if (!(newTown.getBuildNum("towncenter") == 0)) {
                                     if (buildType.equalsIgnoreCase("walls")) {
@@ -103,7 +113,7 @@ public class TownBuildHandler implements SubHandler{
         }
     }
 
-    public void towncenterBuild(String tName, String pName, Selection sel, String bName){
+    public void townCenterBuild(String tName, String pName, Selection sel, String bName){
         Player player = Bukkit.getServer().getPlayer(pName);
         TownDataHandler newTown = new TownDataHandler(tName);
         Cuboid buildSel = new Cuboid(sel.getMaximumPoint(), sel.getMinimumPoint(),tName);
@@ -142,19 +152,23 @@ public class TownBuildHandler implements SubHandler{
     public void baracksBuild(String tName, String pName, Selection sel, String bName){
         Player player = Bukkit.getServer().getPlayer(pName);
         TownDataHandler tData = new TownDataHandler(tName);
-        EconomyMethods playerEcon = new EconomyMethods(pName);
+//        EconomyMethods playerEcon = new EconomyMethods(pName);
         Cuboid buildSel = new Cuboid(sel.getMaximumPoint(), sel.getMinimumPoint(),tName);
         if (tData.getBuildNum("baracks") == 0) {
             if (buildSel.allowedSizeBig()) {
-                if (playerEcon.takeMoneyAllowed(150)) {
-                    //neither did anything
-//                    McMMOPlayerXpGainEvent event = new McMMOPlayerXpGainEvent(player, SkillType.AXES, 5000);
-//                    ExperienceAPI.addLevel(player, SkillType.AXES, 5, true);
-                    playerEcon.takeMoney(150);
+                if (Civilizations.econ.has(pName, 200.0)) {
+                    Civilizations.econ.bankWithdraw(pName, 200.0);
                     Building newBuild = new Building("Baracks", buildSel, bName);
                     tData.addBuild(newBuild);
+                    tData.setBarackPerk(true);
                     tData.saveTownConfig();
-                    player.sendMessage(ChatColor.GREEN + "You successfully created a Baracks!");
+                    //gets list of players to add perk to and adds perm via bPerm plugin
+                    for (String playersInTown : tData.getPlayers()){
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "exec u:" + playersInTown.toLowerCase() + " a:addperm v:mcmmo.perks.lucky.axes w:world");
+                    }
+                    PerkReloader.reloadPermissions();
+                    player.sendMessage(ChatColor.GREEN + "You successfully created a Baracks.");
+                    player.sendMessage(ChatColor.GREEN + "The town now has the axe perk!");
                 } else {
                     player.sendMessage(ChatColor.RED + "You do not have the necessary funds!");
                 }
@@ -170,6 +184,33 @@ public class TownBuildHandler implements SubHandler{
     public void archeryBuild(String tName, String pName, Selection sel, String bName){
         Player player = Bukkit.getServer().getPlayer(pName);
         TownDataHandler tData = new TownDataHandler(tName);
+        Cuboid buildSel = new Cuboid(sel.getMaximumPoint(), sel.getMinimumPoint(),tName);
+        if (tData.getBuildNum("archery") == 0) {
+            if (buildSel.allowedSizeBig()) {
+                if (Civilizations.econ.has(pName, 200.0)) {
+                    Civilizations.econ.bankWithdraw(pName, 200.0);
+                    Building newBuild = new Building("Archery", buildSel, bName);
+                    tData.addBuild(newBuild);
+                    tData.setArcheryPerk(true);
+                    tData.saveTownConfig();
+                    //gets list of players to add perk to and adds perm via bPerm plugin
+                    for (String playersInTown : tData.getPlayers()){
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "exec u:" + playersInTown.toLowerCase() + " a:addperm v:mcmmo.perks.lucky.archery w:world");
+                    }
+                    PerkReloader.reloadPermissions();
+                    player.sendMessage(ChatColor.GREEN + "You successfully created an Archery.");
+                    player.sendMessage(ChatColor.GREEN + "The town now has the archery perk!");
+                } else {
+                    player.sendMessage(ChatColor.RED + "You do not have the necessary funds!");
+                }
+            }
+            else{
+                player.sendMessage(ChatColor.RED + "That selection is not large enough!");
+            }
+        }
+        else{
+            player.sendMessage(ChatColor.RED+ "You may only have one Archery at a time!");
+        }
     }
     public void gatesBuild(String tName, String pName, Selection sel, String bName){
         Player player = Bukkit.getServer().getPlayer(pName);
@@ -190,19 +231,141 @@ public class TownBuildHandler implements SubHandler{
     public void forgeBuild(String tName, String pName, Selection sel, String bName){
         Player player = Bukkit.getServer().getPlayer(pName);
         TownDataHandler tData = new TownDataHandler(tName);
+//        EconomyMethods playerEcon = new EconomyMethods(pName);
+        Cuboid buildSel = new Cuboid(sel.getMaximumPoint(), sel.getMinimumPoint(),tName);
+        if (tData.getBuildNum("forge") == 0) {
+            if (buildSel.allowedSizeBig()) {
+                if (Civilizations.econ.has(pName, 150.0)) {
+                    Civilizations.econ.bankWithdraw(pName, 150.0);
+                    Building newBuild = new Building("Forge", buildSel, bName);
+                    tData.addBuild(newBuild);
+                    tData.setForgePerk(true);
+                    tData.saveTownConfig();
+                    //gets list of players to add perk to and adds perm via bPerm plugin
+                    //had to add in delays because the perm plugin would go to slow and reload before the other command had finished
+                    for (String playersInTown : tData.getPlayers()){
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "exec u:" + playersInTown.toLowerCase() + " a:addperm v:mcmmo.skills.repair w:world");
+                    }
+                    PerkReloader.reloadPermissions();
+                    player.sendMessage(ChatColor.GREEN + "You successfully created a Forge.");
+                    player.sendMessage(ChatColor.GREEN + "You now have access to the repair skill!");
+                } else {
+                    player.sendMessage(ChatColor.RED + "You do not have the necessary funds!");
+                }
+            }
+            else{
+                player.sendMessage(ChatColor.RED + "That selection is not large enough!");
+            }
+        }
+        else{
+            player.sendMessage(ChatColor.RED+ "You may only have one Forge at a time!");
+        }
     }
+    //npc is buggy right now
     public void generalBuild(String tName, String pName, Selection sel, String bName){
         Player player = Bukkit.getServer().getPlayer(pName);
         TownDataHandler tData = new TownDataHandler(tName);
+        Cuboid buildSel = new Cuboid(sel.getMaximumPoint(), sel.getMinimumPoint(),tName);
+        if(tData.getBuildNum("generalstore") == 0){
+            if (buildSel.allowedSizeBig()) {
+                if (Civilizations.econ.has(pName, 100.0)) {
+                    Civilizations.econ.bankWithdraw(pName, 100.0);
+                    Building newBuild = new Building("GeneralStore", buildSel, bName);
+                    tData.addBuild(newBuild);
+                    tData.saveTownConfig();
+
+                    NPCRegistry registry = CitizensAPI.getNPCRegistry();
+                    NPC npc = registry.createNPC(EntityType.PLAYER, "Shop Keeper");
+                    npc.addTrait(TraderCharacterTrait.class);
+                    npc.addTrait(MobType.class);
+                    ((MobType)npc.getTrait(MobType.class)).setType(EntityType.PLAYER);
+                    npc.spawn(player.getLocation());
+                    TraderCommandExecutor test = new TraderCommandExecutor(CitizensTrader.getInstance());
+                    TraderCharacterTrait.TraderType traderType = test.getDefaultTraderType(player);
+                    TraderTrait.WalletType walletType = test.getDefaultWalletType(player, traderType);
+                    TraderTrait settings = ((TraderCharacterTrait)npc.getTrait(TraderCharacterTrait.class)).getTraderTrait();
+                    ((TraderCharacterTrait)npc.getTrait(TraderCharacterTrait.class)).setTraderType(traderType);
+                    settings.setWalletType(walletType);
+                    settings.setOwner(pName);
+                    player.sendMessage(ChatColor.GREEN + "You successfully created a GeneralStore.");
+                } else {
+                    player.sendMessage(ChatColor.RED + "You do not have the necessary funds!");
+                }
+            }
+            else{
+                player.sendMessage(ChatColor.RED + "That selection is not large enough!");
+            }
+        }
+        else{
+            player.sendMessage(ChatColor.RED + "You may only have one GeneralStore at a time!");
+        }
     }
+
+    /**
+     * Creates a bank which gives players in the town the perk of getting double the amount every 15 minutes
+     * This is done directly in the Civilizations method which checks the playername for the perk
+     * @param tName TownName
+     * @param pName PlayerName
+     * @param sel AreaSelection
+     * @param bName NameofBuilding
+     */
     public void bankBuild(String tName, String pName, Selection sel, String bName){
         Player player = Bukkit.getServer().getPlayer(pName);
         TownDataHandler tData = new TownDataHandler(tName);
+        Cuboid buildSel = new Cuboid(sel.getMaximumPoint(), sel.getMinimumPoint(),tName);
+        if (tData.getBuildNum("generalstore") > 0) {
+            if (tData.getBuildNum("bank") == 0) {
+                if (buildSel.allowedSizeBig()) {
+                    if (Civilizations.econ.has(pName, 200.0)) {
+                        Civilizations.econ.bankWithdraw(pName, 200.0);
+                        Building newBuild = new Building("Bank", buildSel, bName);
+                        tData.addBuild(newBuild);
+                        tData.setBankPerk(true);
+                        tData.saveTownConfig();
+                        player.sendMessage(ChatColor.GREEN + "You successfully created a Bank.");
+                        player.sendMessage(ChatColor.GREEN + "You now get double the normal amount every 15 minutes!");
+                    } else {
+                        player.sendMessage(ChatColor.RED + "You do not have the necessary funds!");
+                    }
+                } else {
+                    player.sendMessage(ChatColor.RED + "That selection is not large enough!");
+                }
+            } else {
+                player.sendMessage(ChatColor.RED + "You may only have one Bank at a time!");
+            }
+        } else {
+            player.sendMessage(ChatColor.RED + "You must first build a GeneralStore!");
+        }
     }
     public void templeBuild(String tName, String pName, Selection sel, String bName){
         Player player = Bukkit.getServer().getPlayer(pName);
         TownDataHandler tData = new TownDataHandler(tName);
+        Cuboid buildSel = new Cuboid(sel.getMaximumPoint(), sel.getMinimumPoint(), tName);
+        //Need to later figure out what buildings to check for first
+        if (tData.getBuildNum("temple") < 4) {
+            if (buildSel.allowedSizeBig()) {
+                if(buildSel.containsAmountBlock(Material.GOLD_BLOCK, 5)) {
+                    if (Civilizations.econ.has(pName, 1000.0)) {
+                        Civilizations.econ.bankWithdraw(pName, 1000.0);
+                        Building newBuild = new Building("Temple", buildSel, bName);
+                        tData.addBuild(newBuild);
+                        tData.saveTownConfig();
+                        player.sendMessage(ChatColor.GREEN + "You successfully created a Temple.");
+                    } else {
+                        player.sendMessage(ChatColor.RED + "You do not have the necessary funds!");
+                    }
+                } else{
+                    player.sendMessage(ChatColor.RED + "That selection does not contain enough Gold");
+                }
+            } else {
+                player.sendMessage(ChatColor.RED + "That selection is not large enough!");
+            }
+        } else {
+            player.sendMessage(ChatColor.RED + "You may only have up to three Temples at a time!");
+        }
     }
+
+
     public void teleporterBuild(String tName, String pName, Selection sel, String bName){
         Player player = Bukkit.getServer().getPlayer(pName);
         TownDataHandler tData = new TownDataHandler(tName);

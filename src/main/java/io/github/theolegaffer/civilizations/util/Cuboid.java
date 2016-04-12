@@ -112,6 +112,16 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
         }
         return blockList;
     }
+    public boolean containsAmountBlock(Material type,int amount){
+        List<Block> blockList = getBlocks();
+        int count = 0;
+        for(Block block : blockList){
+            if(block.getType() == type){
+                count++;
+            }
+        }
+        return count == amount;
+    }
 
     public Location getLowerLocation() {
         return this.minimumPoint.toLocation(this.getWorld());

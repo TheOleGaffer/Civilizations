@@ -2,55 +2,60 @@ package io.github.theolegaffer.civilizations;
 
 
 
-import com.gmail.nossr50.api.ExperienceAPI;
-import com.gmail.nossr50.datatypes.SkillType;
-import com.gmail.nossr50.events.experience.McMMOPlayerXpGainEvent;
 import io.github.theolegaffer.civilizations.Economy.EconomyMethods;
 import io.github.theolegaffer.civilizations.commands.*;
 import io.github.theolegaffer.civilizations.commands.TownHandlers.*;
 import io.github.theolegaffer.civilizations.commands.TownHandlers.SetHandlers.SetBorderHandler;
 import io.github.theolegaffer.civilizations.events.LoginListener;
 import io.github.theolegaffer.civilizations.events.PlayerMoveListener;
-import io.github.theolegaffer.civilizations.events.XPGainListener;
-import io.github.theolegaffer.civilizations.util.Cuboid;
-import io.github.theolegaffer.civilizations.util.ListStore;
+//import io.github.theolegaffer.civilizations.events.XPCivGainListener;
 import io.github.theolegaffer.civilizations.util.TownDataHandler;
 import mondocommand.MondoCommand;
-import org.bukkit.ChatColor;
+import net.milkbowl.vault.chat.Chat;
+import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.permission.Permission;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
-import java.util.ArrayList;
+import java.util.logging.Logger;
 
 
 /**
  * Created by Sam on 7/12/2015.
  */
 public class Civilizations extends JavaPlugin implements Listener{
-
+    private static final Logger log = Logger.getLogger("Minecraft");
+    public static Economy econ = null;
+    public static Permission perms = null;
+    public static Chat chat = null;
 
 
     @Override
     public void onEnable(){
-
         setupFilePaths();
         setupCommandHelpers();
+        if (!setupEconomy()) {
+            log.severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        setupPermissions();
+        setupChat();
 
-        this.getCommand("addmoney").setExecutor(new AddMoneyCommand(this));
-        this.getCommand("givemoney").setExecutor(new GiveMoneyCommand(this));
-        this.getCommand("money").setExecutor(new MoneyCommand(this));
-        this.getCommand("removemoney").setExecutor(new RemoveMoneyCommand(this));
-        this.getCommand("setmoney").setExecutor(new SetMoneyCommand(this));
+//        this.getCommand("addmoney").setExecutor(new AddMoneyCommand(this));
+//        this.getCommand("givemoney").setExecutor(new GiveMoneyCommand(this));
+//        this.getCommand("money").setExecutor(new MoneyCommand(this));
+//        this.getCommand("removemoney").setExecutor(new RemoveMoneyCommand(this));
+//        this.getCommand("setmoney").setExecutor(new SetMoneyCommand(this));
 
         this.getCommand("accept").setExecutor(new AcceptCommand(this));
         this.getCommand("decline").setExecutor(new DeclineCommand(this));
         getServer().getPluginManager().registerEvents(new LoginListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerMoveListener(), this); //for playermove event when entering towns
-        getServer().getPluginManager().registerEvents(new XPGainListener(), this);
-        this.getLogger().info("Civilizations has been enabled on this server!");
+//        getServer().getPluginManager().registerEvents(new XPCivGainListener(), this);
+        log.info("Civilizations has been enabled on this server!");
 /**
  * This is starts the economy schedule to add 20 dollars every 15 minutes
  *
@@ -58,16 +63,17 @@ public class Civilizations extends JavaPlugin implements Listener{
         this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
-                getLogger().info("Added money");
+                log.info("Added money");
                 for (Player target : getServer().getOnlinePlayers()) {
                     String name = target.getName();
-                    EconomyMethods playerData = new EconomyMethods(name);
-                    playerData.giveMoney(20);
-                    playerData.savePlayerConfig();
+                    econ.bankDeposit(name, 20);
+                    TownDataHandler tData = new TownDataHandler(name);
+                    if(tData.getBankPerk()){
+                        econ.bankDeposit(name,20);
+                    }
                 }
             }
         }, 0, 18000);
-
     }
     public void setupFilePaths(){
         String pluginFolder = this.getDataFolder().getAbsolutePath();
@@ -76,6 +82,28 @@ public class Civilizations extends JavaPlugin implements Listener{
         (new File(pluginFolder + File.separator + "PlayerData")).mkdirs();
         (new File(pluginFolder + File.separator + "TownData")).mkdirs();
 
+    }
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        econ = rsp.getProvider();
+        return econ != null;
+    }
+    private boolean setupChat() {
+        RegisteredServiceProvider<Chat> rsp = getServer().getServicesManager().getRegistration(Chat.class);
+        chat = rsp.getProvider();
+        return chat != null;
+    }
+
+    private boolean setupPermissions() {
+        RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
+        perms = rsp.getProvider();
+        return perms != null;
     }
     public void setupCommandHelpers(){
         MondoCommand base = new MondoCommand();

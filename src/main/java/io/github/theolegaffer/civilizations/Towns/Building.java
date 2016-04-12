@@ -14,6 +14,7 @@ public class Building {
     protected String name;
     protected String linked;
     protected String location;
+    protected String templeType;
 
 //    public Building(String type, Cuboid cuboid){
 //        this.type = type;
@@ -28,6 +29,7 @@ public class Building {
         this.enterMessage = "Welcome to the " + type;
         this.leaveMessage = "none";
         this.location = cuboid.newSerialize();
+        this.templeType = "none";
     }
 
     public Building(String type, Cuboid cuboid, String name, String linked){
@@ -38,6 +40,15 @@ public class Building {
         this.enterMessage = "Welcome to the " + type;
         this.leaveMessage = "none";
         this.location = cuboid.newSerialize();
+        this.templeType = "none";
+    }
+
+    public String getTempleType(){
+        return this.templeType;
+    }
+
+    public void setTempleType(String type){
+        this.templeType = type;
     }
 
     public String getLinked() {

@@ -2,6 +2,7 @@ package io.github.theolegaffer.civilizations.commands.TownHandlers;
 
 import io.github.theolegaffer.civilizations.Economy.EconomyMethods;
 import io.github.theolegaffer.civilizations.util.ListStore;
+import io.github.theolegaffer.civilizations.util.PerkReloader;
 import io.github.theolegaffer.civilizations.util.TownDataHandler;
 import mondocommand.CallInfo;
 import mondocommand.MondoFailure;
@@ -29,7 +30,9 @@ public class TownDeleteHandler implements SubHandler{
                     EconomyMethods econTarg = new EconomyMethods(temp);
                     econTarg.setTown("none");
                     econTarg.savePlayerConfig();
+                    delTown.setPlayerPerks(temp, false);
                 }
+                PerkReloader.reloadPermissions();
                 delTown.deleteTownConfig();
                 townList.remove(tName);
                 townList.save();

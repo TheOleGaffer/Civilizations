@@ -2,8 +2,8 @@ main: io.github.theolegaffer.civilizations.Civilizations
 name: Civilizations
 version: 1.0
 website: http://github.com/theolegaffer
-author: Sam
-depend: [WorldEdit, mcMMO]
+author: Sam Rensenhouse
+depend: [WorldEdit, mcMMO, Vault, Citizens, DtlCitizensTrader]
 
 commands:
   town:

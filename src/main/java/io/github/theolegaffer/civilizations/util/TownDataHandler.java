@@ -1,6 +1,7 @@
 package io.github.theolegaffer.civilizations.util;
 
 import io.github.theolegaffer.civilizations.Towns.Building;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -49,6 +50,13 @@ public class TownDataHandler extends JavaPlugin {
             tDataConfig.set("info.playerlist", list);
             tDataConfig.set("info.townspawn", "");
             tDataConfig.set("info.townlimits", "");
+            tDataConfig.set("info.forgeperk", false);
+            tDataConfig.set("info.baracksperk", false);
+            tDataConfig.set("info.archeryperk", false);
+            tDataConfig.set("info.bankperk", false);
+            tDataConfig.set("info.templewater", false);
+            tDataConfig.set("info.templefire", false);
+            tDataConfig.set("info.templeair", false);
             tDataConfig.createSection("buildings");
             tDataConfig.createSection("building");
             tDataConfig.set("buildings.towncenter", 0);
@@ -66,6 +74,44 @@ public class TownDataHandler extends JavaPlugin {
             tDataConfig.set("buildings.teleporter", 0);
         }
     }
+    //Make sure to reload file afterwards with PerkReloader don't have it in case of looping
+    //Value as true adds, as false it removes
+    public void setPlayerPerks(String name, boolean value){
+        if(value){
+            if(getBarackPerk()){
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "exec u:" + name.toLowerCase() + " a:addperm v:mcmmo.perks.lucky.axes w:world");
+            }
+            if(getForgePerk()){
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "exec u:" + name.toLowerCase() + " a:addperm v:mcmmo.skills.repair w:world");
+            }
+        }
+        else{
+            if(getBarackPerk()){
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "exec u:" + name.toLowerCase() + " a:rmperm v:mcmmo.perks.lucky.axes w:world");
+            }
+            if(getForgePerk()){
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "exec u:" + name.toLowerCase() + " a:rmperm v:mcmmo.skills.repair w:world");
+            }
+        }
+    }
+//    public boolean hasPerk(String perkType){
+//        if(perkType.equals("baracks")){
+//            return baracksPerk;
+//        }
+//        else if(perkType.equals("forge")){
+//            return forgePerk;
+//        }
+//        return false;
+//    }
+//
+//    public void setPerk(String perkType, boolean value){
+//        if(perkType.equals("baracks")){
+//            baracksPerk = value;
+//        }
+//        else if(perkType.equals("forge")){
+//            forgePerk = value;
+//        }
+//    }
 
     public void deleteTownConfig(){
             tDataFile.delete();
@@ -88,13 +134,41 @@ public class TownDataHandler extends JavaPlugin {
         List<String> newList = new ArrayList<>();
         newList.add(playername);
         list.addAll(newList);
-        tDataConfig.set("info.playerlist",list);
+        tDataConfig.set("info.playerlist", list);
+        setPlayerPerks(playername, true);
+        PerkReloader.reloadPermissions();
     }
 
     public void removePlayers(String playername){
         List<String> list = tDataConfig.getStringList("info.playerlist");
         list.remove(playername);
-        tDataConfig.set("info.playerlist",list);
+        tDataConfig.set("info.playerlist", list);
+        setPlayerPerks(playername, false);
+        PerkReloader.reloadPermissions();
+    }
+    public boolean getBankPerk(){
+        return tDataConfig.getBoolean("info.bankperk");
+    }
+    public void setBankPerk(boolean value){
+        tDataConfig.set("info.bankperk", value);
+    }
+    public void setBarackPerk(boolean value){
+        tDataConfig.set("info.baracksperk", value);
+    }
+    public boolean getBarackPerk(){
+        return tDataConfig.getBoolean("info.baracksperk");
+    }
+    public void setForgePerk(boolean value){
+        tDataConfig.set("info.forgeperk", value);
+    }
+    public boolean getForgePerk(){
+        return tDataConfig.getBoolean("info.forgeperk");
+    }
+    public void setArcheryPerk(boolean value){
+        tDataConfig.set("info.archeryperk", value);
+    }
+    public boolean getArcheryPerk(){
+        return tDataConfig.getBoolean("info.archeryperk");
     }
 
     public void setOwner(String ownerName){
@@ -187,6 +261,7 @@ public class TownDataHandler extends JavaPlugin {
         tDataConfig.set("buildings." + type.toLowerCase(), (getBuildNum(type) + 1));
     }
 
+    //Need to deal with perks when finishing this
     public void removeBuild(String name){
         String type = tDataConfig.getString("building." + name + ".type");
         //cannot actually delete the building
