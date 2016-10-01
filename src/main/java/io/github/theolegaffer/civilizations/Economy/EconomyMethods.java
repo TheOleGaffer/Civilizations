@@ -50,6 +50,9 @@ public class EconomyMethods extends JavaPlugin {
         }
     }
 
+    public boolean isInTown(){
+        return pDataConfig.getString("Town") == "none";
+    }
     public String getTown(){
         return pDataConfig.getString("Town");
     }
@@ -75,10 +78,7 @@ public class EconomyMethods extends JavaPlugin {
         }
     }
     public boolean takeMoneyAllowed(int amount){
-        if (getMoney() - amount < 0){
-            return false;
-        }
-        else return true;
+        return getMoney() - amount >= 0;
     }
 
     public void giveMoney(int amount) {

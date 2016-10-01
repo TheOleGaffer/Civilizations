@@ -12,62 +12,39 @@ package io.github.theolegaffer.civilizations;
 //import org.bukkit.command.CommandSender;
 //import org.bukkit.entity.Player;
 //import org.bukkit.plugin.Plugin;
+import io.github.theolegaffer.civilizations.util.LocationSerializer;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.HashMap;
 
 /**
  * Created by Sam on 7/13/2015.
  */
-public class Tools extends JavaPlugin {
-//    private Selection s;
-//
-//    public WorldEditPlugin getWorldEdit(){
-//        Plugin p = Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
-//        if (p instanceof WorldEditPlugin) return (WorldEditPlugin) p;
-//        else{
-//            this.getLogger().info("WorldEdit is not installed on this server.");
-//
-//            return null;
-//        }
-//
-//    }
-//
-//    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
-//        if (!(sender instanceof Player)){
-//            sender.sendMessage(ChatColor.RED + "The console cannot use /setbuild");
-//            return true;
-//        }
-//        Player p = (Player) sender;
-//
-//        if (cmd.getName().equalsIgnoreCase("setbuild")){
-//            s = getWorldEdit().getSelection(p);
-//            if (s == null) {
-//                sender.sendMessage(ChatColor.RED + "Select two points first!");
-//                return true;
-//            }
-//            else{
-//                sender.sendMessage(ChatColor.GREEN + "Set area!");
-//            }
-//
-//        }
-//        return false;
-//    }
+public class Tools {
+    public static HashMap<String, Player> replaceBlockMap = null;
+    public static HashMap<String, >
 
+    public static void setupBlockChanger(){
+        replaceBlockMap = new HashMap<String, Player>();
+    }
+    public static void resetBlocks(){
+        if (!(replaceBlockMap.isEmpty())) {
+            for (String key : replaceBlockMap.keySet()) {
+                Location location = LocationSerializer.getDeserializedLocation(key);
+                Block block = location.getBlock();
+                block.setType(Material.OBSIDIAN);
+            }
+        }
+    }
+    public static void addToReplaceBlock(String locationOfBlock, Player player){
+        replaceBlockMap.put(locationOfBlock,player);
+    }
+    public static void removeFromReplaceBlock(String locationOfBlock){
+        replaceBlockMap.remove(locationOfBlock);
+    }
 }
-//    Selection sel = worldEditPlugin.getSelection(player);
-//
-//    if (sel instanceof CuboidSelection) {
-//        Vector min = sel.getNativeMinimumPoint();
-//        Vector max = sel.getNativeMaximumPoint();
-//        for(int x = min.getBlockX();x <= max.getBlockX(); x=x+1){
-//            for(int y = min.getBlockY();y <= max.getBlockY(); y=y+1){
-//                for(int z = min.getBlockZ();z <= max.getBlockZ(); z=z+1){
-//                    Location tmpblock = new Location(player.getWorld(), x, y, z);
-//                    tmpblock.getBlock().setType(Material.AIR); //Just For debug
-//                }
-//            }
-//        }
-//        player.sendMessage(ChatColor.AQUA + "Undo Complete!");
-//    }else{
-//        player.sendMessage(ChatColor.DARK_RED + "Invalid Selection!");
-//    }
 

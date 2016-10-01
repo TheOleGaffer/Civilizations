@@ -2,11 +2,12 @@ package io.github.theolegaffer.civilizations;
 
 
 
-import io.github.theolegaffer.civilizations.Economy.EconomyMethods;
 import io.github.theolegaffer.civilizations.commands.*;
 import io.github.theolegaffer.civilizations.commands.TownHandlers.*;
 import io.github.theolegaffer.civilizations.commands.TownHandlers.SetHandlers.SetBorderHandler;
 import io.github.theolegaffer.civilizations.events.LoginListener;
+import io.github.theolegaffer.civilizations.events.OnBlockBreakListener;
+import io.github.theolegaffer.civilizations.events.OnDamageListener;
 import io.github.theolegaffer.civilizations.events.PlayerMoveListener;
 //import io.github.theolegaffer.civilizations.events.XPCivGainListener;
 import io.github.theolegaffer.civilizations.util.TownDataHandler;
@@ -19,6 +20,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 
@@ -30,6 +32,8 @@ public class Civilizations extends JavaPlugin implements Listener{
     public static Economy econ = null;
     public static Permission perms = null;
     public static Chat chat = null;
+    public HashMap replaceBlockMap = null;
+
 
 
     @Override
@@ -43,15 +47,12 @@ public class Civilizations extends JavaPlugin implements Listener{
         }
         setupPermissions();
         setupChat();
-
-//        this.getCommand("addmoney").setExecutor(new AddMoneyCommand(this));
-//        this.getCommand("givemoney").setExecutor(new GiveMoneyCommand(this));
-//        this.getCommand("money").setExecutor(new MoneyCommand(this));
-//        this.getCommand("removemoney").setExecutor(new RemoveMoneyCommand(this));
-//        this.getCommand("setmoney").setExecutor(new SetMoneyCommand(this));
+        Tools.setupBlockChanger();
 
         this.getCommand("accept").setExecutor(new AcceptCommand(this));
         this.getCommand("decline").setExecutor(new DeclineCommand(this));
+        getServer().getPluginManager().registerEvents(new OnDamageListener(), this);
+        getServer().getPluginManager().registerEvents(new OnBlockBreakListener(), this);
         getServer().getPluginManager().registerEvents(new LoginListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerMoveListener(), this); //for playermove event when entering towns
 //        getServer().getPluginManager().registerEvents(new XPCivGainListener(), this);
@@ -105,6 +106,7 @@ public class Civilizations extends JavaPlugin implements Listener{
         perms = rsp.getProvider();
         return perms != null;
     }
+
     public void setupCommandHelpers(){
         MondoCommand base = new MondoCommand();
         MondoCommand setSub = new MondoCommand();
@@ -168,6 +170,7 @@ public class Civilizations extends JavaPlugin implements Listener{
     }
     @Override
     public void onDisable(){
+        Tools.resetBlocks(); //changes all obsidian unmined with fire perk back to obsidian
         this.getLogger().info("Civilizations has been disabled on this server.");
     }
 

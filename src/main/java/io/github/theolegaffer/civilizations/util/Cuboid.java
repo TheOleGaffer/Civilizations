@@ -160,10 +160,7 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
     }
 
     public boolean allowedSizeBig(){
-        if (getVolume() >= 50){
-            return true;
-        }
-        else return false;
+        return getVolume() >= 50;
     }
 
     public World getWorld() {

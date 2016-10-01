@@ -26,7 +26,7 @@ public class GiveMoneyCommand implements CommandExecutor {
                 Player player = (Player) sender;
 
                 if (target != null) {
-                    EconomyMethods econSend = new EconomyMethods(player.getPlayerListName());
+                    EconomyMethods econSend = new EconomyMethods(player.getPlayerListName().toLowerCase());
                     EconomyMethods econTarg = new EconomyMethods(target.getPlayerListName());
 
                     if (econSend.getMoney() - amount < 0) {

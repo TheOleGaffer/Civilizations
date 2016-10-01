@@ -5,6 +5,7 @@ import com.sk89q.worldedit.bukkit.selections.Selection;
 import io.github.theolegaffer.civilizations.Civilizations;
 import io.github.theolegaffer.civilizations.Economy.EconomyMethods;
 import io.github.theolegaffer.civilizations.Towns.Building;
+import io.github.theolegaffer.civilizations.Towns.Temple;
 import io.github.theolegaffer.civilizations.util.Cuboid;
 import io.github.theolegaffer.civilizations.util.PerkReloader;
 import io.github.theolegaffer.civilizations.util.TownDataHandler;
@@ -19,6 +20,7 @@ import net.dtl.citizens.trader.CitizensTrader;
 import net.dtl.citizens.trader.TraderCharacterTrait;
 import net.dtl.citizens.trader.TraderCommandExecutor;
 import net.dtl.citizens.trader.traits.TraderTrait;
+import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -50,7 +52,7 @@ public class TownBuildHandler implements SubHandler{
         String tName = econTarg.getTown();
         Player player = Bukkit.getServer().getPlayer(pName);
         String buildType = call.getArg(0);
-        String bName = call.getArg(1);
+        String buildingName = call.getArg(1);
         if (!(tName.equals("none"))){
             TownDataHandler newTown = new TownDataHandler(tName);
             sel = getWorldEdit().getSelection(player);
@@ -60,37 +62,43 @@ public class TownBuildHandler implements SubHandler{
                 //Checks if it is in the town borders
                 if(Cuboid.newDeserialize(newTown.getTownLimits()).containsLocation(sel.getMaximumPoint()) && Cuboid.newDeserialize(newTown.getTownLimits()).containsLocation(sel.getMinimumPoint())) {
                     //Checks if the name is taken
-                    if (!(newTown.containsBuildName(bName))){
+                    if (!(newTown.containsBuildName(buildingName))){
                         //Checks if any of the blocks are in another building
                         if (!(newTown.inBuildingBorder(sel.getMaximumPoint(), sel.getMinimumPoint()))) {
                             if (buildType.equalsIgnoreCase("towncenter")) {
-                                townCenterBuild(tName, pName, sel, bName);
+                                townCenterBuild(tName, pName, sel, buildingName);
                             } else {
                                 if (!(newTown.getBuildNum("towncenter") == 0)) {
                                     if (buildType.equalsIgnoreCase("walls")) {
-                                        wallBuild(tName, pName, sel, bName);
+                                        wallBuild(tName, pName, sel, buildingName);
                                     } else if (buildType.equalsIgnoreCase("baracks")) {
-                                        baracksBuild(tName, pName, sel, bName);
+                                        baracksBuild(tName, pName, sel, buildingName);
                                     } else if (buildType.equalsIgnoreCase("archery")) {
-                                        archeryBuild(tName, pName, sel, bName);
+                                        archeryBuild(tName, pName, sel, buildingName);
                                     } else if (buildType.equalsIgnoreCase("gates")) {
-                                        gatesBuild(tName, pName, sel, bName);
+                                        gatesBuild(tName, pName, sel, buildingName);
                                     } else if (buildType.equalsIgnoreCase("farm")) {
-                                        farmBuild(tName, pName, sel, bName);
+                                        farmBuild(tName, pName, sel, buildingName);
                                     } else if (buildType.equalsIgnoreCase("apothecary")) {
-                                        apothecaryBuild(tName, pName, sel, bName);
+                                        apothecaryBuild(tName, pName, sel, buildingName);
                                     } else if (buildType.equalsIgnoreCase("barn")) {
-                                        barnBuild(tName, pName, sel, bName);
+                                        barnBuild(tName, pName, sel, buildingName);
                                     } else if (buildType.equalsIgnoreCase("forge")) {
-                                        forgeBuild(tName, pName, sel, bName);
+                                        forgeBuild(tName, pName, sel, buildingName);
                                     } else if (buildType.equalsIgnoreCase("generalstore")) {
-                                        generalBuild(tName, pName, sel, bName);
+                                        generalBuild(tName, pName, sel, buildingName);
                                     } else if (buildType.equalsIgnoreCase("bank")) {
-                                        bankBuild(tName, pName, sel, bName);
+                                        bankBuild(tName, pName, sel, buildingName);
                                     } else if (buildType.equalsIgnoreCase("temple")) {
-                                        templeBuild(tName, pName, sel, bName);
+                                        templeBuild(tName, pName, sel, buildingName);
                                     } else if (buildType.equalsIgnoreCase("teleporter")) {
-                                        teleporterBuild(tName, pName, sel, bName);
+                                        teleporterBuild(tName, pName, sel, buildingName);
+                                    } else if (buildType.equalsIgnoreCase("fireshrine")) {
+                                        fireShrineBuild(tName, pName, sel, buildingName);
+                                    } else if (buildType.equalsIgnoreCase("watershrine")) {
+                                        waterShrineBuild(tName, pName, sel, buildingName);
+                                    } else if (buildType.equalsIgnoreCase("airshrine")) {
+                                        airShrineBuild(tName, pName, sel, buildingName);
                                     }
                                 } else {
                                     call.reply("{RED}You must first have a TownCenter!");
@@ -164,7 +172,8 @@ public class TownBuildHandler implements SubHandler{
                     tData.saveTownConfig();
                     //gets list of players to add perk to and adds perm via bPerm plugin
                     for (String playersInTown : tData.getPlayers()){
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "exec u:" + playersInTown.toLowerCase() + " a:addperm v:mcmmo.perks.lucky.axes w:world");
+//                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "exec u:" + playersInTown.toLowerCase() + " a:addperm v:mcmmo.perks.lucky.axes w:world");
+                        tData.setPlayerPerks(playersInTown, true);
                     }
                     PerkReloader.reloadPermissions();
                     player.sendMessage(ChatColor.GREEN + "You successfully created a Baracks.");
@@ -195,7 +204,8 @@ public class TownBuildHandler implements SubHandler{
                     tData.saveTownConfig();
                     //gets list of players to add perk to and adds perm via bPerm plugin
                     for (String playersInTown : tData.getPlayers()){
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "exec u:" + playersInTown.toLowerCase() + " a:addperm v:mcmmo.perks.lucky.archery w:world");
+//                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "exec u:" + playersInTown.toLowerCase() + " a:addperm v:mcmmo.perks.lucky.archery w:world");
+                        tData.setPlayerPerks(playersInTown, true);
                     }
                     PerkReloader.reloadPermissions();
                     player.sendMessage(ChatColor.GREEN + "You successfully created an Archery.");
@@ -244,7 +254,7 @@ public class TownBuildHandler implements SubHandler{
                     //gets list of players to add perk to and adds perm via bPerm plugin
                     //had to add in delays because the perm plugin would go to slow and reload before the other command had finished
                     for (String playersInTown : tData.getPlayers()){
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "exec u:" + playersInTown.toLowerCase() + " a:addperm v:mcmmo.skills.repair w:world");
+                        tData.setPlayerPerks(playersInTown, true);
                     }
                     PerkReloader.reloadPermissions();
                     player.sendMessage(ChatColor.GREEN + "You successfully created a Forge.");
@@ -278,13 +288,13 @@ public class TownBuildHandler implements SubHandler{
                     NPC npc = registry.createNPC(EntityType.PLAYER, "Shop Keeper");
                     npc.addTrait(TraderCharacterTrait.class);
                     npc.addTrait(MobType.class);
-                    ((MobType)npc.getTrait(MobType.class)).setType(EntityType.PLAYER);
+                    npc.getTrait(MobType.class).setType(EntityType.PLAYER);
                     npc.spawn(player.getLocation());
                     TraderCommandExecutor test = new TraderCommandExecutor(CitizensTrader.getInstance());
                     TraderCharacterTrait.TraderType traderType = test.getDefaultTraderType(player);
                     TraderTrait.WalletType walletType = test.getDefaultWalletType(player, traderType);
-                    TraderTrait settings = ((TraderCharacterTrait)npc.getTrait(TraderCharacterTrait.class)).getTraderTrait();
-                    ((TraderCharacterTrait)npc.getTrait(TraderCharacterTrait.class)).setTraderType(traderType);
+                    TraderTrait settings = npc.getTrait(TraderCharacterTrait.class).getTraderTrait();
+                    npc.getTrait(TraderCharacterTrait.class).setTraderType(traderType);
                     settings.setWalletType(walletType);
                     settings.setOwner(pName);
                     player.sendMessage(ChatColor.GREEN + "You successfully created a GeneralStore.");
@@ -347,12 +357,13 @@ public class TownBuildHandler implements SubHandler{
                 if(buildSel.containsAmountBlock(Material.GOLD_BLOCK, 5)) {
                     if (Civilizations.econ.has(pName, 1000.0)) {
                         Civilizations.econ.bankWithdraw(pName, 1000.0);
-                        Building newBuild = new Building("Temple", buildSel, bName);
+//                        Building newBuild = new Building("Temple", buildSel, bName);
+                        Building newBuild = new Temple(buildSel, bName);
                         tData.addBuild(newBuild);
                         tData.saveTownConfig();
                         player.sendMessage(ChatColor.GREEN + "You successfully created a Temple.");
                     } else {
-                        player.sendMessage(ChatColor.RED + "You do not have the necessary funds!");
+                        player.sendMessage(ChatColor.RED + "You do not have the necessary funds (1000)!");
                     }
                 } else{
                     player.sendMessage(ChatColor.RED + "That selection does not contain enough Gold");
@@ -362,6 +373,104 @@ public class TownBuildHandler implements SubHandler{
             }
         } else {
             player.sendMessage(ChatColor.RED + "You may only have up to three Temples at a time!");
+        }
+    }
+
+    public void fireShrineBuild(String tName, String pName, Selection sel, String bName){
+        Player player = Bukkit.getServer().getPlayer(pName);
+        TownDataHandler tData = new TownDataHandler(tName);
+        Cuboid buildSel = new Cuboid(sel.getMaximumPoint(), sel.getMinimumPoint(), tName);
+        if (tData.getBuildNum("temple") == 0) {
+            if(tData.getFirePerk()) {
+                if (buildSel.allowedSizeBig()) {
+                    if (buildSel.containsAmountBlock(Material.FIRE, 4)) {
+                        if (Civilizations.econ.has(pName, 500.0)) {
+                            Civilizations.econ.bankWithdraw(pName, 500.0);
+                            Building newBuild = new Building("fireshrine", buildSel, bName);
+                            tData.addBuild(newBuild);
+                            tData.saveTownConfig();
+                            tData.setShrineFirePerk(true);
+                            tData.saveTownConfig();
+                            player.sendMessage(ChatColor.GREEN + "You successfully created a Fire Shrine.");
+                        } else {
+                            player.sendMessage(ChatColor.RED + "You do not have the necessary funds (500)!");
+                        }
+                    } else {
+                        player.sendMessage(ChatColor.RED + "That selection does not contain enough Fire (4 Blocks)");
+                    }
+                } else {
+                    player.sendMessage(ChatColor.RED + "That selection is not large enough!");
+                }
+            } else{
+                player.sendMessage(ChatColor.RED + "You do not have a temple dedicated to fire!");
+            }
+        } else {
+            player.sendMessage(ChatColor.RED + "You must first have a Temple!");
+        }
+    }
+    public void waterShrineBuild(String tName, String pName, Selection sel, String bName){
+        Player player = Bukkit.getServer().getPlayer(pName);
+        TownDataHandler tData = new TownDataHandler(tName);
+        Cuboid buildSel = new Cuboid(sel.getMaximumPoint(), sel.getMinimumPoint(), tName);
+        if (tData.getBuildNum("temple") == 0) {
+            if(tData.getWaterPerk()) {
+                if (buildSel.allowedSizeBig()) {
+                    if (buildSel.containsAmountBlock(Material.WATER, 4) || buildSel.containsAmountBlock(Material.STATIONARY_WATER, 4)) {
+                        if (Civilizations.econ.has(pName, 500.0)) {
+                            Civilizations.econ.bankWithdraw(pName, 500.0);
+                            Building newBuild = new Building("watershrine", buildSel, bName);
+                            tData.addBuild(newBuild);
+                            tData.saveTownConfig();
+                            tData.setShrineWaterPerk(true);
+                            tData.saveTownConfig();
+                            player.sendMessage(ChatColor.GREEN + "You successfully created a Water Shrine.");
+                        } else {
+                            player.sendMessage(ChatColor.RED + "You do not have the necessary funds (500)!");
+                        }
+                    } else {
+                        player.sendMessage(ChatColor.RED + "That selection does not contain enough Water (4 Blocks)");
+                    }
+                } else {
+                    player.sendMessage(ChatColor.RED + "That selection is not large enough!");
+                }
+            } else{
+                player.sendMessage(ChatColor.RED + "You do not have a temple dedicated to water!");
+            }
+        } else {
+            player.sendMessage(ChatColor.RED + "You must first have a Temple!");
+        }
+    }
+
+    public void airShrineBuild(String tName, String pName, Selection sel, String bName){
+        Player player = Bukkit.getServer().getPlayer(pName);
+        TownDataHandler tData = new TownDataHandler(tName);
+        Cuboid buildSel = new Cuboid(sel.getMaximumPoint(), sel.getMinimumPoint(), tName);
+        if (tData.getBuildNum("temple") == 0) {
+            if(tData.getAirPerk()) {
+                if (buildSel.allowedSizeBig()) {
+                    if (buildSel.containsAmountBlock(Material.AIR, 50)) {
+                        if (Civilizations.econ.has(pName, 500.0)) {
+                            Civilizations.econ.bankWithdraw(pName, 500.0);
+                            Building newBuild = new Building("airshrine", buildSel, bName);
+                            tData.addBuild(newBuild);
+                            tData.saveTownConfig();
+                            tData.setShrineAirPerk(true);
+                            tData.saveTownConfig();
+                            player.sendMessage(ChatColor.GREEN + "You successfully created a Air Shrine.");
+                        } else {
+                            player.sendMessage(ChatColor.RED + "You do not have the necessary funds (500)!");
+                        }
+                    } else {
+                        player.sendMessage(ChatColor.RED + "That selection does not contain enough Air (50 Blocks)");
+                    }
+                } else {
+                    player.sendMessage(ChatColor.RED + "That selection is not large enough!");
+                }
+            } else{
+                player.sendMessage(ChatColor.RED + "You do not have a temple dedicated to air!");
+            }
+        } else {
+            player.sendMessage(ChatColor.RED + "You must first have a Temple!");
         }
     }
 

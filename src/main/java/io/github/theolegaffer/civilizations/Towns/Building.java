@@ -15,11 +15,13 @@ public class Building {
     protected String linked;
     protected String location;
     protected String templeType;
+    public static final String Default = "none";
 
 //    public Building(String type, Cuboid cuboid){
 //        this.type = type;
 //        this.cuboid = cuboid;
 //    }
+    public Building(){}
 
     public Building(String type, Cuboid cuboid, String name){
         this.type = type;
@@ -29,7 +31,6 @@ public class Building {
         this.enterMessage = "Welcome to the " + type;
         this.leaveMessage = "none";
         this.location = cuboid.newSerialize();
-        this.templeType = "none";
     }
 
     public Building(String type, Cuboid cuboid, String name, String linked){
@@ -43,21 +44,7 @@ public class Building {
         this.templeType = "none";
     }
 
-    public String getTempleType(){
-        return this.templeType;
-    }
 
-    public void setTempleType(String type){
-        this.templeType = type;
-    }
-
-    public String getLinked() {
-        return linked;
-    }
-
-    public void setLinked(String linked) {
-        this.linked = linked;
-    }
 
     public String getName() {
         return name;
@@ -102,5 +89,26 @@ public class Building {
     public String getLocation(){
         return location;
     }
+
+    public String getDefaultEnterMessage(){
+        return "Welcome to the " + this.type;
+    }
+
+    public String getLinked() {
+        return Default;
+    }
+
+    public void setLinked(String linked) {
+        this.linked = linked;
+    }
+
+    public String getTempleType(){
+        return Default;
+    }
+
+    public void setTempleType(String type){
+        this.templeType = type;
+    }
+
 }
 

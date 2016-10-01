@@ -41,12 +41,18 @@ public class TownInfoHandler implements SubHandler{
         else {
             TownDataHandler tData = new TownDataHandler(tName);
             List<String> nList = tData.getPlayers();
+            List<String> buildList = tData.getBuildList();
             String names = "";
+            String building = "";
             for (String temp : nList) {
                 names = names + temp + " ";
             }
+            for (String temp : buildList){
+                building = building + temp + " ";
+            }
             call.reply("{AQUA}Owner: " + tData.getOwner());
             call.reply("{AQUA}Townmembers: " + names);
+            call.reply("{AQUA}Buildings: " + building);
         }
     }
 }

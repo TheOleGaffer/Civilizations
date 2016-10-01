@@ -19,7 +19,7 @@ public class SetBorderHandler implements SubHandler{
     public void handle(CallInfo call) throws MondoFailure{
         Player player = call.getPlayer();
         Location loc = player.getLocation();
-        String pName = player.getPlayerListName();
+        String pName = player.getPlayerListName().toLowerCase();
         Double locX = loc.getX();
         Double locZ = loc.getZ();
         Double newUpX; Double newUpZ; Double newLowX; Double newLowZ;

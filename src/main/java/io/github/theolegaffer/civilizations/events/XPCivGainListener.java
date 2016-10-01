@@ -51,7 +51,7 @@
 //                }
 //            }
 //            Player player = (Player) damager;
-//            String pName = player.getPlayerListName();
+//            String pName = player.getPlayerListName().toLowerCase();
 ////            SkillType skill = event.getSkill();
 ////            int amount = event.getXpGained();
 ////            if (amount < 0){

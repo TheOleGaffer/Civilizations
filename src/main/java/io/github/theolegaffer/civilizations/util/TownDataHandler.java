@@ -1,6 +1,8 @@
 package io.github.theolegaffer.civilizations.util;
 
 import io.github.theolegaffer.civilizations.Towns.Building;
+import io.github.theolegaffer.civilizations.Towns.Teleporter;
+import io.github.theolegaffer.civilizations.Towns.Temple;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -57,6 +59,9 @@ public class TownDataHandler extends JavaPlugin {
             tDataConfig.set("info.templewater", false);
             tDataConfig.set("info.templefire", false);
             tDataConfig.set("info.templeair", false);
+            tDataConfig.set("info.shrineair", false);
+            tDataConfig.set("info.shrinefire", false);
+            tDataConfig.set("info.shrinewater", false);
             tDataConfig.createSection("buildings");
             tDataConfig.createSection("building");
             tDataConfig.set("buildings.towncenter", 0);
@@ -72,6 +77,9 @@ public class TownDataHandler extends JavaPlugin {
             tDataConfig.set("buildings.bank", 0);
             tDataConfig.set("buildings.temple", 0);
             tDataConfig.set("buildings.teleporter", 0);
+            tDataConfig.set("buildings.fireshrine", 0);
+            tDataConfig.set("buildings.watershrine", 0);
+            tDataConfig.set("buildings.airshrine", 0);
         }
     }
     //Make sure to reload file afterwards with PerkReloader don't have it in case of looping
@@ -84,6 +92,9 @@ public class TownDataHandler extends JavaPlugin {
             if(getForgePerk()){
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "exec u:" + name.toLowerCase() + " a:addperm v:mcmmo.skills.repair w:world");
             }
+            if(getArcheryPerk()){
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "exec u:" + name.toLowerCase() + " a:addperm v:mcmmo.perks.lucky.archery w:world");
+            }
         }
         else{
             if(getBarackPerk()){
@@ -91,6 +102,9 @@ public class TownDataHandler extends JavaPlugin {
             }
             if(getForgePerk()){
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "exec u:" + name.toLowerCase() + " a:rmperm v:mcmmo.skills.repair w:world");
+            }
+            if(getArcheryPerk()){
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "exec u:" + name.toLowerCase() + " a:rmperm v:mcmmo.perks.lucky.archery w:world");
             }
         }
     }
@@ -152,8 +166,44 @@ public class TownDataHandler extends JavaPlugin {
     public void setBankPerk(boolean value){
         tDataConfig.set("info.bankperk", value);
     }
+    public boolean getWaterPerk(){
+        return tDataConfig.getBoolean("info.templewater");
+    }
+    public boolean getFirePerk(){
+        return tDataConfig.getBoolean("info.templefire");
+    }
+    public boolean getAirPerk(){
+        return tDataConfig.getBoolean("info.templeair");
+    }
+    public void setAirPerk(boolean value){
+        tDataConfig.set("info.templeair", value);
+    }
+    public void setFirePerk(boolean value){
+        tDataConfig.set("info.templefire", value);
+    }
+    public void setWaterPerk(boolean value){
+        tDataConfig.set("info.templewater", value);
+    }
     public void setBarackPerk(boolean value){
         tDataConfig.set("info.baracksperk", value);
+    }
+    public void setShrineAirPerk(boolean value){
+        tDataConfig.set("info.shrineair", value);
+    }
+    public void setShrineWaterPerk(boolean value){
+        tDataConfig.set("info.shrinewater", value);
+    }
+    public void setShrineFirePerk(boolean value){
+        tDataConfig.set("info.shrinefire", value);
+    }
+    public boolean getShrineWaterPerk(){
+        return tDataConfig.getBoolean("info.shrinewater");
+    }
+    public boolean getShrineFirePerk(){
+        return tDataConfig.getBoolean("info.shrinefire");
+    }
+    public boolean getShrineAirPerk(){
+        return tDataConfig.getBoolean("info.shrineair");
     }
     public boolean getBarackPerk(){
         return tDataConfig.getBoolean("info.baracksperk");
@@ -202,10 +252,7 @@ public class TownDataHandler extends JavaPlugin {
 
     public boolean inTownBorder(Location location){
         Cuboid townBorder = Cuboid.newDeserialize(getTownLimits());
-        if (townBorder.containsLocation(location)){
-            return true;
-        }
-        else return false;
+        return townBorder.containsLocation(location);
     }
 
     public boolean inBuildingBorder(Location location){
@@ -214,6 +261,39 @@ public class TownDataHandler extends JavaPlugin {
             Cuboid temp = Cuboid.newDeserialize(tDataConfig.getString("building." + name + ".location"));
             if (temp.containsLocation(location)){
                 return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Retuns a building name from a location
+     * Must first check if the location has a building before calling
+     *
+     * @param location Needs the location to check
+     * @return Returns the string of a building name given a location
+     */
+    public Building getBuildingFromLoc(Location location){
+        List<String> bList = getBuildList();
+        for (String name : bList){
+            Cuboid temp = Cuboid.newDeserialize(tDataConfig.getString("building." + name + ".location"));
+            if (temp.containsLocation(location)){
+                return getBuildObject(name);
+            }
+        }
+        return null;
+    }
+
+    public boolean inSpecificBuildingBorder(Location location, String type){
+        List<String> bList = getBuildList();
+        for (String name : bList){
+            String bType = tDataConfig.getString("building." + name + ".type");
+            //if the building is the correct type
+            if(bType.equals(type)) {
+                Cuboid temp = Cuboid.newDeserialize(tDataConfig.getString("building." + name + ".location"));
+                if (temp.containsLocation(location)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -240,25 +320,41 @@ public class TownDataHandler extends JavaPlugin {
         return tDataConfig.getString("building." + buildName + ".location");
     }
 
+//    if(type == "temple"){
+//            Temple newTemple = (Temple) building;
+//            tDataConfig.set("building." + name + ".templetype", newTemple.getTempleType());
+//        }
+//        if(type == "teleporter"){
+//            Teleporter newTeleporter = (Teleporter) building;
+//            tDataConfig.set("building." + name + ".linkedbuild", newTeleporter.getLinked());
+//        }
     public void addBuild(Building building) {
         String type = building.getType();
         String name = building.getName();
-        String location = building.getLocation();
-        String enterM = building.getEnterMessage();
-        String leaveM = building.getLeaveMessage();
-        String linkedBuild = building.getLinked();
+//        String linkedBuild = building.getLinked();
         tDataConfig.set("building." + name, name);
         tDataConfig.set("building." + name + ".type", type);
-        tDataConfig.set("building." + name + ".location", location);
-        tDataConfig.set("building." + name + ".entermessage", enterM);
-        tDataConfig.set("building." + name + ".leavemessage", leaveM);
-        tDataConfig.set("building." + name + ".linkedbuild", linkedBuild);
+        tDataConfig.set("building." + name + ".location", building.getLocation());
+        tDataConfig.set("building." + name + ".entermessage", building.getEnterMessage());
+        tDataConfig.set("building." + name + ".leavemessage", building.getLeaveMessage());
+        tDataConfig.set("building." + name + ".linkedbuild", building.getLinked());
+        tDataConfig.set("building." + name + ".templetype", building.getTempleType());
         //Adds new building to list
         List<String> bList = getBuildList();
         bList.add(name);
         tDataConfig.set("info.buildlist", bList);
         //Adds the count of the type of buildings
         tDataConfig.set("buildings." + type.toLowerCase(), (getBuildNum(type) + 1));
+    }
+
+    public Building getBuildObject(String buildName){
+        String location = getBuildLocation(buildName);
+        Building building = new Building(getBuildType(buildName),Cuboid.newDeserialize(location),buildName);
+        return building;
+    }
+
+    private String getBuildType(String buildName) {
+        return tDataConfig.getString("building." + buildName + ".type");
     }
 
     //Need to deal with perks when finishing this

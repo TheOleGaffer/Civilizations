@@ -15,7 +15,7 @@ public class LoginListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerLoginEvent event){
         Player player = event.getPlayer();
-        EconomyMethods econ = new EconomyMethods(player.getPlayerListName());
+        EconomyMethods econ = new EconomyMethods(player.getPlayerListName().toLowerCase());
 
         econ.createPlayerConfig();
         econ.createPlayerDefaults();

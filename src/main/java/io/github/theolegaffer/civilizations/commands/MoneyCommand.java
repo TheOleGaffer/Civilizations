@@ -22,7 +22,7 @@ public class MoneyCommand implements CommandExecutor {
         if (cmd.getName().equalsIgnoreCase("money")){
             if (sender instanceof Player) {
                 Player player = (Player) sender;
-                EconomyMethods econ = new EconomyMethods(player.getPlayerListName());
+                EconomyMethods econ = new EconomyMethods(player.getPlayerListName().toLowerCase());
                 sender.sendMessage("You have " + econ.getMoney() + " dollars!");
                 return true;
             }
