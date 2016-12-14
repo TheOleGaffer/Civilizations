@@ -22,7 +22,7 @@ public class PlayerToggleFlightListener implements Listener{
         if(storedPlayer.isInTown()){
             TownDataHandler playersTown = new TownDataHandler(storedPlayer.getTown());
             if(playersTown.getShrineAirPerk()){
-
+//todo
             }
         }
     }
